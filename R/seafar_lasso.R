@@ -152,6 +152,8 @@ seafar_lasso <- function(data,
 #' \item{scores}{The best estimated factor score matrix (from the unshrunk refit if \code{unshrink = TRUE}).}
 #' \item{Lossvec}{A list of vectors of loss values of each starting value (lasso fits).}
 #' \item{Loss}{Loss value of the best starting value; the residual sum of squares of the refit if \code{unshrink = TRUE}.}
+#' \item{PVE}{Proportion of variance explained by the returned loadings and scores (no penalty term included).}
+#' \item{lambda}{The LASSO penalty tuning parameter used.}
 #' \item{all_losses}{Penalized loss of every starting value (lasso fits).}
 #' \item{n_best}{Number of starting values that reached the lowest lasso loss (within 0.01).}
 #' \item{n_distinct}{Number of distinct lasso loss values across starting values.}
@@ -227,6 +229,7 @@ seafar_lasso_multistart <- function(data,
   return_varselect$n_best <- n_best
   return_varselect$n_distinct <- n_distinct
   return_varselect$converged <- converged[k]
+  return_varselect$lambda <- lambda
   return_varselect$center <- result$center # same for every start
   return_varselect$scale <- result$scale
 
@@ -249,6 +252,10 @@ seafar_lasso_multistart <- function(data,
     return_varselect$Loss_lasso <- LOSS[k]
     return_varselect$converged <- refit$converged
   }
+
+  # computed directly because the PVE of a lasso fit has the penalty included in its loss
+  data_scaled <- scale(data, center = return_varselect$center, scale = return_varselect$scale)
+  return_varselect$PVE <- 1 - ssres(data_scaled, return_varselect$scores, return_varselect$loadings) / sum(data_scaled^2)
 
   attr(return_varselect, "class") <- "lasso_multistart"
 
@@ -274,15 +281,31 @@ summary.lasso_multistart <- function(object, disp = "loadings", nrow = 10, ...) 
 
   if (disp == "loadings") {
     cat(sprintf(
-      "\nThe number of nonzero loadings is: %s\n",
+      "\nThe LASSO penalty is: %.3f\n",
+      object$lambda
+    ))
+    cat(sprintf(
+      "The number of nonzero loadings is: %s\n",
       sum(round(object$loadings, 3) != 0)
+    ))
+    cat(sprintf(
+      "The PEV is: %.3f\n",
+      object$PVE
     ))
     cat(sprintf("\nThe estimated loadings matrix is \n"))
     print(utils::head(round(object$loadings, 3), nrow))
   } else if (disp == "full") {
     cat(sprintf(
-      "\nThe number of nonzero loadings is: %s\n",
+      "\nThe LASSO penalty is: %.3f\n",
+      object$lambda
+    ))
+    cat(sprintf(
+      "The number of nonzero loadings is: %s\n",
       sum(round(object$loadings, 3) != 0)
+    ))
+    cat(sprintf(
+      "The PEV is: %.3f\n",
+      object$PVE
     ))
 
     cat(sprintf("\nThe estimated loadings matrix is \n"))
