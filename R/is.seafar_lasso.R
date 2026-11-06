@@ -233,4 +233,21 @@ is_lasso_path <- function(data, nfactors, lasso_vec, maxiter, eps, INIT, standar
 }
 
   return(sel_lasso)
+# Fits can fail for an unlucky random start, so retry before giving up
+retry_lasso <- function(fit, what, lambda, times = 10) {
+  for (ntry in seq_len(times)) {
+    res <- tryCatch(
+      fit(),
+      error = function(e) {
+        message(sprintf("%s failed (lambda = %g): %s, retrying...",
+                        what, lambda, conditionMessage(e)))
+        NULL
+      }
+    )
+    if (!is.null(res)) {
+      return(res)
+    }
+  }
+  stop(sprintf("%s failed %d times for lambda = %g; see the messages above", what, times, lambda))
+}
 }
