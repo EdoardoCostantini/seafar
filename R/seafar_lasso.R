@@ -27,6 +27,7 @@ seafar_lasso <- function(data,
                          initloadings = NULL,
                          standardize = TRUE,
                          pattern = NULL) {
+  INIT <- check_init(INIT)
   N <- dim(data)[1]
   J <- dim(data)[2]
 
@@ -178,13 +179,10 @@ seafar_lasso_multistart <- function(data,
                                     maxiter = 50,
                                     eps = 10^-4,
                                     INIT = "semirational",
-                                    nstarts,
+                                    nstarts = 50,
                                     standardize = TRUE,
                                     unshrink = TRUE) {
-  if (missing(nstarts)) {
-    nstarts <- 20
-  }
-
+  INIT <- check_init(INIT)
   Pout3d <- list()
   Tout3d <- list()
   LOSS <- array()
