@@ -62,7 +62,7 @@ is.seafar_original <- function(data,
     data <- scale(data, center = FALSE, scale = xscale)
   }
 
-  seafar_result <- seafar_multistart(
+  seafar_result <- seafar(
     data = data,
     nfactors = nfactors,
     C = C,
@@ -137,10 +137,6 @@ is.seafar <- function(data,
                       eps = 10^-4,
                       INIT = "semirational",
                       orthogonal = FALSE,
-                      nstarts,
-                      TOL,
-                      THR,
-                      standardize = TRUE) {
                       nstarts = 50,
                       TOL = 3,
                       THR = 0.03,
@@ -235,8 +231,21 @@ is.seafar <- function(data,
 #' summary(IS_result)
 #' }
 summary.is_seafar <- function(object, ...) {
+  selcard <- if (is.list(object)) object$selcard else object
   cat(sprintf(
     "The cardinality selected by the Index of Sparseness is: %s\n",
-    object
+    selcard
   ))
+
+  if (is.list(object)) {
+    cat(sprintf(
+      "The PEV with this cardinality is: %.3f\n",
+      object$pve
+    ))
+
+    cat(sprintf(
+      "The PEV of the unconstrained model (no zero loadings) is: %.3f\n",
+      object$pvepca
+    ))
+  }
 }
