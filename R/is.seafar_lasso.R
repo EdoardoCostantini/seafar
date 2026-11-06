@@ -24,7 +24,7 @@
 #'   data = X,
 #'   nfactors = 5,
 #'   lambda = 100,
-#'   INIT = "mixed",
+#'   INIT = "semirational",
 #'   nstarts = 50
 #' )
 #' }
@@ -34,8 +34,9 @@ IS_lasso <- function(data,
                      maxiter = 50,
                      eps = 10^-4,
                      INIT = "semirational",
-                     nstarts,
+                     nstarts = 50,
                      standardize = TRUE){
+  INIT <- check_init(INIT)
   N <- dim(data)[1]
   J <- dim(data)[2]
 
@@ -118,18 +119,19 @@ IS_lasso <- function(data,
 #' lambda <- is.seafar_lasso(
 #'   data = X,
 #'   nfactors = 5,
-#'   max_lambda = 100,
-#'   INIT = 'mixed',
+#'   warmstart = FALSE,
 #'   nstarts = 50)
 #'}
 is.seafar_lasso <- function(data,
                             nfactors,
-                            max_lambda,
+                            warmstart = TRUE,
                             maxiter = 50,
                             eps = 10^-4,
-                            INIT = 'semirational',
-                            nstarts,
+                            INIT = if (warmstart) "rational" else "semirational",
+                            nstarts = 50,
+                            lambda.length = 50,
                             standardize = TRUE) {
+  INIT <- check_init(INIT)
   N <- dim(data)[2]
   I <- dim(data)[1]
 
