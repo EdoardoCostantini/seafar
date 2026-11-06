@@ -9,9 +9,9 @@ is.seafar_wst(
   nfactors,
   eps = 1e-04,
   maxiter = 50,
-  INIT,
+  INIT = "rational",
   orthogonal = FALSE,
-  card.length,
+  card.length = 100,
   show_progress = FALSE,
   standardize = TRUE
 )
@@ -25,11 +25,11 @@ is.seafar_wst(
 
 \item{maxiter}{Maximum number of iterations for the AO procedure.}
 
-\item{INIT}{Method to initialize loading matrix.}
+\item{INIT}{Method to initialize loading matrix, default is \code{"rational"}.}
 
 \item{orthogonal}{Orthogonal or non-orthogonal factors, default is FALSE.}
 
-\item{card.length}{Number of candidate cardinality values to test.}
+\item{card.length}{Number of candidate cardinality values to test, default is 100.}
 
 \item{show_progress}{Option of print progress bar, default is FALSE.}
 

@@ -7,11 +7,12 @@
 is.seafar_lasso(
   data,
   nfactors,
-  max_lambda,
+  warmstart = TRUE,
   maxiter = 50,
   eps = 10^-4,
-  INIT = "semirational",
-  nstarts,
+  INIT = if (warmstart) "rational" else "semirational",
+  nstarts = 50,
+  lambda.length = 50,
   standardize = TRUE
 )
 }
@@ -20,32 +21,54 @@ is.seafar_lasso(
 
 \item{nfactors}{The number of factors.}
 
-\item{max_lambda}{Maximum LASSO penalty parameter.}
+\item{warmstart}{Logical. If \code{TRUE} (default), use warm starts.}
 
 \item{maxiter}{Maximum number of iterations of the AO procedure.}
 
 \item{eps}{Convergence criterion based on difference in loss between iterates.}
 
-\item{INIT}{Method to initialize loading matrix.}
+\item{INIT}{Method to initialize loading matrix. The default is \code{"rational"} if \code{warmstart = TRUE}
+and \code{"semirational"} if \code{warmstart = FALSE}.}
 
-\item{nstarts}{Number of starts.}
+\item{nstarts}{Number of starts for fitting the selected model and, if \code{warmstart = FALSE}, for model selection.}
+
+\item{lambda.length}{Number of candidate lambda values to evaluate.}
 
 \item{standardize}{Logical. If \code{TRUE} (default), items are scaled to unit variance (N denominator)
 after centering. Centering is applied regardless.}
 }
 \value{
-The selected LASSO penalty parameter.
+A list with
+\item{sellambda}{The selected LASSO penalty parameter.}
+\item{selmodel}{The output of \code{seafar_lasso_multistart()} fitted with the selected penalty.}
+\item{pve}{Proportion of variance explained by the selected model.}
+\item{pvepca}{Proportion of variance explained by the unconstrained model (first nfactors principal components).}
 }
 \description{
-Model selection procedure with IS to choose the LASSO penalty paramter.
+The grid of candidate penalties runs up to the largest value that still leaves
+at least 3 nonzero loadings on every factor, which is found
+internally with \code{\link{lambda_max}}.
+}
+\details{
+With \code{warmstart = TRUE} (the default) the candidate penalties are evaluated once each, in
+increasing order, using the loadings of the previous penalty as starting values.
+This is much faster, but the results depend more on the initial solution. The
+path stops at the first penalty that leaves fewer than 3 nonzero loadings on a factor.
 }
 \examples{
 \dontrun{
-lambda <- is.seafar_lasso(
+IS_result <- is.seafar_lasso(
   data = X,
   nfactors = 5,
-  max_lambda = 100,
-  INIT = 'mixed',
+  nstarts = 50)
+summary(IS_result)
+summary(IS_result$selmodel)
+
+# slower, using multiple starts for every candidate penalty
+IS_result <- is.seafar_lasso(
+  data = X,
+  nfactors = 5,
+  warmstart = FALSE,
   nstarts = 50)
 }
 }
