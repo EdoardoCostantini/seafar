@@ -162,22 +162,75 @@ is.seafar_lasso <- function(data,
                           k, lasso_vec[k], conditionMessage(e)))
           NULL
         }
-      )
-      if (!is.null(res)) {
-        a       <- res
-        success <- TRUE
-      } else if (ntry >= 10) {
-        stop(sprintf("IS_lasso failed %d times for lambda = %g; see the messages above", ntry, lasso_vec[k]))
-      }
-      # else it loops and tries again
+# Evaluates the IS along an increasing sequence of penalties, each fit starting from the
+# loadings of the previous one. Penalties after the path stops are left as NA.
+is_lasso_path <- function(data, nfactors, lasso_vec, maxiter, eps, INIT, standardize) {
+  N <- dim(data)[1]
+  J <- dim(data)[2]
+
+  # 0. Center (always) and optionally scale to unit variance (N denominator), once for the whole path
+  data <- scale(data, center = TRUE, scale = FALSE)
+  xscale <- rep(1, J)
+  if (standardize) {
+    xscale <- sqrt(colSums(data^2) / N)
+    if (any(xscale < sqrt(.Machine$double.eps))) {
+      stop("data contains item(s) with zero variance; remove them or use standardize = FALSE")
     }
+    data <- scale(data, center = FALSE, scale = xscale)
+  }
+
+  fit0 <- retry_lasso(
+    function() {
+      seafar_lasso(
+        data = data,
+        nfactors = nfactors,
+        lambda = 0,
+        maxiter = maxiter,
+        eps = eps,
+        INIT = INIT,
+        standardize = FALSE # data already preprocessed above
+      )
+    },
+    what = "seafar_lasso",
+    lambda = 0
+  )
+
+  V_oo <- sum(data^2)
+  V_s <- sum((fit0$scores %*% t(fit0$loadings))^2)
+  loadings <- fit0$loadings
+
+  avec <- lasso_is_table(length(lasso_vec))
+  for (k in seq_along(lasso_vec)) {
+    fit <- seafar_lasso(
+      data = data,
+      nfactors = nfactors,
+      lambda = lasso_vec[k],
+      maxiter = maxiter,
+      eps = eps,
+      INIT = INIT,
+      initloadings = loadings,
+      standardize = FALSE # data already preprocessed above
+    )
+    loadings <- fit$loadings
+
+    # a factor that lost its loadings cannot recover along the path
+    if (any(!enough_items(loadings, min_items = 3))) {
+      break
+    }
+
+    a <- is_lasso_stats(loadings, fit$scores, V_s, V_oo)
     avec[k, ] <- c(
       lasso_vec[k], a$value, a$vaf, a$propzero,
       a$smallestP, a$maxsdP
     )
   }
 
-  sel_lasso <- lasso_vec[which.max(avec[,2])]
+  if (is.na(avec[1, "IS"])) {
+    stop("no candidate penalty leaves at least 3 nonzero loadings on every factor; try fewer factors or warmstart = FALSE")
+  }
+
+  return(avec)
+}
 
   return(sel_lasso)
 }
