@@ -459,36 +459,44 @@ seafar_general <- function(data,
 #' @param object Object of class inheriting from 'seafar'.
 #' @param disp The default is \code{"loadings"} which returns only the estimated loadings matrix.
 #'             Otherwise if \code{"full"}, function returns both the estimated loadings and factor scores matrices.
+#' @param nrow Number of rows of the loading matrix to be displayed, default is 10.
 #' @param ...  Argument to be passed to or from other methods.
-#'
 #' @export
-#'
 #' @examples
 #' \dontrun{
-#' results <- seafar(X)
-#' summary(results, disp = "full")
+#' summary(big5_result, disp = "full")
 #' }
-summary.seafar <- function(object, disp = "loadings", ...) {
-  if (is.null(disp)) {
+summary.seafar <- function(object, disp = "loadings", nrow = 10, ...) {
+  if (missing(disp)) {
     disp <- "loadings"
   }
+
+  load_fmt <- formatC(object$loadings, format = "f", digits = 3, drop0trailing = TRUE)
+  pev <- object$PVE[length(object$PVE)]
 
   if (disp == "loadings") {
     cat(sprintf(
       "\nThe number of nonzero loadings is: %s\n",
-      sum(object$loadings != 0)
+      sum(round(object$loadings, 3) != 0)
     ))
-
+    cat(sprintf(
+      "The PEV is: %.3f\n",
+      pev
+    ))
     cat(sprintf("\nThe estimated loadings matrix is \n"))
-    print(utils::head(round(object$loadings, 3), 10))
-  } else {
+    print(noquote(utils::head(load_fmt, nrow)))
+  } else if (disp == "full") {
     cat(sprintf(
       "\nThe number of nonzero loadings is: %s\n",
-      sum(object$loadings != 0)
+      sum(round(object$loadings, 3) != 0)
+    ))
+    cat(sprintf(
+      "The PEV is: %.3f\n",
+      pev
     ))
 
     cat(sprintf("\nThe estimated loadings matrix is \n"))
-    print(utils::head(round(object$loadings, 3), 10))
+    print(noquote(utils::head(load_fmt, nrow)))
 
     cat(sprintf("\nThe estimated factor scores matrix is \n"))
     print(object$scores)
