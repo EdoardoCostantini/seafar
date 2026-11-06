@@ -28,7 +28,10 @@ seafar <- function(data,
                    maxiter = 50,
                    initloadings = NULL,
                    INIT,
+                   INIT = "semirational",
                    orthogonal = FALSE,
+                   nstarts = 50,
+                   show_progress = FALSE,
                    standardize = TRUE) {
   if (orthogonal == TRUE) {
     result <- seafar_orthogonal(
@@ -51,6 +54,10 @@ seafar <- function(data,
       initloadings = initloadings,
       INIT = INIT,
       standardize = standardize
+  INIT <- check_init(INIT)
+  if (!is.null(initloadings) || INIT == "svd") {
+    nstarts <- 1 # every start would be identical
+  }
     )
   }
   # 3. Return output
@@ -90,8 +97,9 @@ seafar_orthogonal <- function(data,
                               eps = 1e-4,
                               maxiter = 50,
                               initloadings = NULL,
-                              INIT,
+                              INIT = "semirational",
                               standardize = TRUE) {
+  INIT <- check_init(INIT)
   N <- dim(data)[1]
   J <- dim(data)[2]
 
@@ -243,8 +251,9 @@ seafar_general <- function(data,
                            eps = 1e-4,
                            maxiter = 50,
                            initloadings = NULL,
-                           INIT,
+                           INIT = "semirational",
                            standardize = TRUE) {
+  INIT <- check_init(INIT)
   N <- dim(data)[1]
   J <- dim(data)[2]
 
