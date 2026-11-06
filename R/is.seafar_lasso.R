@@ -250,4 +250,39 @@ retry_lasso <- function(fit, what, lambda, times = 10) {
   }
   stop(sprintf("%s failed %d times for lambda = %g; see the messages above", what, times, lambda))
 }
+
+#' Display a summary of the results of \code{is.seafar_lasso()}.
+#'
+#' Use \code{summary(object$selmodel)} to display the loading matrix of the selected model.
+#'
+#' @param object Object of class inheriting from 'is_seafar_lasso'.
+#' @param ... Argument to be passed to or from other methods.
+#'
+#' @returns Summary of the results.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' summary(IS_result)
+#' }
+summary.is_seafar_lasso <- function(object, ...) {
+  cat(sprintf(
+    "The LASSO penalty selected by the Index of Sparseness is: %.3f\n",
+    object$sellambda
+  ))
+
+  cat(sprintf(
+    "The number of nonzero loadings with this penalty is: %s\n",
+    sum(round(object$selmodel$loadings, 3) != 0)
+  ))
+
+  cat(sprintf(
+    "The PEV with this penalty is: %.3f\n",
+    object$pve
+  ))
+
+  cat(sprintf(
+    "The PEV of the unconstrained model (no zero loadings) is: %.3f\n",
+    object$pvepca
+  ))
 }
