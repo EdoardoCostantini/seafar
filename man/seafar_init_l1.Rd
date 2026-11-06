@@ -11,7 +11,7 @@ seafar_init_l1(data, nfactors, INIT)
 
 \item{nfactors}{Number of factors.}
 
-\item{INIT}{Methods to initialize loadings c("svd", "random", "mixed).}
+\item{INIT}{Methods to initialize loadings c("svd", "random", "rational", "semirational").}
 }
 \value{
 A matrix of initial loadings.

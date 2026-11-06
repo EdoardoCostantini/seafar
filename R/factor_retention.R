@@ -1,6 +1,6 @@
 #' Function to retain number of factors/components using various methods.
 #'
-#' @param data A NxJ matrix of standardized items.
+#' @param data A NxJ matrix or data frame of observed variables.
 #' @param large.data Logical. If TRUE, use methods suitable for very large datasets.
 #'
 #' @returns Number of factors/components.

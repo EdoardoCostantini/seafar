@@ -13,7 +13,7 @@ seafar_init(data, nfactors, C, INIT)
 
 \item{C}{The number of zero loadings.}
 
-\item{INIT}{Methods to initialize loadings c("svd", "random", "rational", "mixed).
+\item{INIT}{Methods to initialize loadings c("svd", "random", "rational", "semirational").
 Rational start uses the result of Ding and He (2004) to partition the
 variables into nfactors clusters.
 Mixed start combines random (20\%) and SVD (80\%).}

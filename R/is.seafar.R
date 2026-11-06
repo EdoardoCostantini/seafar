@@ -41,10 +41,11 @@ is.seafar_original <- function(data,
                                C,
                                maxiter = 50,
                                eps = 10^-4,
-                               INIT,
+                               INIT = "semirational",
                                orthogonal = FALSE,
-                               nstarts,
+                               nstarts = 50,
                                standardize = TRUE) {
+  INIT <- check_init(INIT)
   N <- dim(data)[1]
   J <- dim(data)[2]
 
@@ -61,7 +62,7 @@ is.seafar_original <- function(data,
     data <- scale(data, center = FALSE, scale = xscale)
   }
 
-  seafar_result <- seafar_multistart(
+  seafar_result <- seafar(
     data = data,
     nfactors = nfactors,
     C = C,
@@ -113,6 +114,7 @@ is.seafar_original <- function(data,
 #' @param THR Thresholding selection for the smallest nonzero loading.
 #' @param standardize Logical. If \code{TRUE} (default), items are scaled to unit variance
 #'   after centering. Centering is applied regardless.
+#' @param card.length Maximum number of candidate cardinality values to test, default is 100.
 #'
 #' @returns The selected cardinality value.
 #' @export
@@ -133,20 +135,22 @@ is.seafar <- function(data,
                       nfactors,
                       maxiter = 50,
                       eps = 10^-4,
-                      INIT,
+                      INIT = "semirational",
                       orthogonal = FALSE,
-                      nstarts,
-                      TOL,
-                      THR,
-                      standardize = TRUE) {
+                      nstarts = 50,
+                      TOL = 3,
+                      THR = 0.03,
+                      standardize = TRUE,
+                      card.length = 100) {
+  INIT <- check_init(INIT)
   J <- dim(data)[2]
 
   col_names <- c("K", "IS", "PEV", "Prop0", "MinNonZeroL", "MaxSDL")
   rows <- list()
 
   # --- cardinalities (total number of nonzero loadings) ---
-  if (nfactors * (J - 3) > 100) {
-    cardvec <- round(seq(3 * nfactors, J * nfactors - 1, length.out = 100))
+  if (nfactors * (J - 3) > card.length) {
+    cardvec <- round(seq(3 * nfactors, J * nfactors - 1, length.out = card.length))
   } else {
     cardvec <- seq(3 * nfactors, J * nfactors - 1, by = 1)
   }
@@ -227,8 +231,21 @@ is.seafar <- function(data,
 #' summary(IS_result)
 #' }
 summary.is_seafar <- function(object, ...) {
+  selcard <- if (is.list(object)) object$selcard else object
   cat(sprintf(
     "The cardinality selected by the Index of Sparseness is: %s\n",
-    object
+    selcard
   ))
+
+  if (is.list(object)) {
+    cat(sprintf(
+      "The PEV with this cardinality is: %.3f\n",
+      object$pve
+    ))
+
+    cat(sprintf(
+      "The PEV of the unconstrained model (no zero loadings) is: %.3f\n",
+      object$pvepca
+    ))
+  }
 }

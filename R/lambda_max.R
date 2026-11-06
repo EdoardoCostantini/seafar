@@ -20,7 +20,7 @@
 #' max_lambda <- lambda_max(
 #'   data = scale(big5),
 #'   nfactors = 5,
-#'   INIT = 'mixed')
+#'   INIT = 'semirational')
 #'}
 lambda_max <- function(data,
                        nfactors,
@@ -32,6 +32,7 @@ lambda_max <- function(data,
                        INIT = 'semirational',
                        max_iter = 25,
                        standardize = TRUE){
+  INIT <- check_init(INIT)
   N <- dim(data)[1]
   J <- dim(data)[2]
 
@@ -149,7 +150,7 @@ enough_items <- function(loadings,
 #'   scale(big5),
 #'   nfactors = 5,
 #'   lambda = 10,
-#'   INIT = 'mixed',
+#'   INIT = 'semirational',
 #'   nstarts = 1)
 #'}
 fit_once <- function(data,
@@ -160,6 +161,7 @@ fit_once <- function(data,
                      INIT = 'semirational',
                      nstarts = 1,
                      standardize = TRUE){
+  INIT <- check_init(INIT)
   fit <- seafar_lasso_multistart(data = data,
                                  nfactors = nfactors,
                                  maxiter = maxiter,

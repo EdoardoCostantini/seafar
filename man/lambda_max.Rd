@@ -50,6 +50,6 @@ Function to find the maximum LASSO penalty parameter for a given data set
 max_lambda <- lambda_max(
   data = scale(big5),
   nfactors = 5,
-  INIT = 'mixed')
+  INIT = 'semirational')
 }
 }

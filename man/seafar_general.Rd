@@ -12,7 +12,7 @@ seafar_general(
   eps = 1e-04,
   maxiter = 50,
   initloadings = NULL,
-  INIT,
+  INIT = "semirational",
   standardize = TRUE
 )
 }

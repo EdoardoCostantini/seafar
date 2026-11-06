@@ -45,7 +45,7 @@ P <- seafar_lasso_multistart(
   scale(big5),
   nfactors = 5,
   lambda = 10,
-  INIT = 'mixed',
+  INIT = 'semirational',
   nstarts = 1)
 }
 }
