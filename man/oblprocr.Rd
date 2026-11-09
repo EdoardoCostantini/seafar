@@ -9,6 +9,8 @@ oblprocr(data, scores, loadings, maxiter, eps)
 \arguments{
 \item{data}{Data matrix of standardized items NxJ.}
 
+\item{scores}{Factor scores matrix NxQ.}
+
 \item{loadings}{Loadings matrix JxQ.}
 
 \item{maxiter}{Maximum number of iterations.}

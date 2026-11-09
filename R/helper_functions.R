@@ -67,6 +67,7 @@ orthprocr <- function(data, loadings) {
 #' Function to calculate the solution to the olique procrustes problem.
 #'
 #' @param data Data matrix of standardized items NxJ.
+#' @param scores Factor scores matrix NxQ.
 #' @param loadings Loadings matrix JxQ.
 #' @param maxiter Maximum number of iterations.
 #' @param eps Tolerance for difference in loss.
@@ -134,6 +135,7 @@ oblprocr <- function(data, scores, loadings, maxiter, eps){
 #' This version is slightly less efficient.
 #'
 #' @param data Data matrix of standardized items NxJ.
+#' @param scores Factor scores matrix NxQ.
 #' @param loadings Loadings matrix JxQ.
 #' @param maxiter Maximum number of iterations.
 #' @param eps Tolerance for difference in loss.
