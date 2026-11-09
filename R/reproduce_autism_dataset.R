@@ -8,6 +8,7 @@
 #' For more information, consult `data/README.md`.
 #'
 #' @param source_url Source URL of the original Series Matrix file on the NCBI GEO ftp server.
+#' @param envir the environment where the function is called from.
 #' @importFrom utils read.csv
 #'
 #' @return Invisibly returns the processed matrix `autism`.

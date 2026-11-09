@@ -12,6 +12,8 @@ reproduce_autism_dataset(
 }
 \arguments{
 \item{source_url}{Source URL of the original Series Matrix file on the NCBI GEO ftp server.}
+
+\item{envir}{the environment where the function is called from.}
 }
 \value{
 Invisibly returns the processed matrix \code{autism}.
