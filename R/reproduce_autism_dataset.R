@@ -11,6 +11,8 @@
 #' @importFrom utils read.csv
 #'
 #' @return Invisibly returns the processed matrix `autism`.
+#' @examples
+#' autism <- reproduce_autism_dataset()
 #' @export
 reproduce_autism_dataset <- function(
   source_url = "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE7nnn/GSE7329/matrix/GSE7329_series_matrix.txt.gz",

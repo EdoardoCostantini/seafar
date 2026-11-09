@@ -25,3 +25,6 @@ Running \code{autism <- reproduce_autism_dataset()} is equivalent to \code{data(
 
 For more information, consult \code{data/README.md}.
 }
+\examples{
+autism <- reproduce_autism_dataset()
+}
