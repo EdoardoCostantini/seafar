@@ -31,4 +31,5 @@ BugReports: https://github.com/trale97/seafar/issues
 Depends: 
     R (>= 3.5)
 LazyData: true
+LazyDataCompression: xz
 VignetteBuilder: quarto
