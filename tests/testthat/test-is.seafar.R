@@ -1,46 +1,66 @@
-testthat::skip_if_not_installed("qgraph")
+testthat::skip_if_not_installed("lavaan")
 
-data("big5", package = "qgraph")
-big5_std <- as.matrix(scale(big5))
+data("HolzingerSwineford1939", package = "lavaan")
+hs <- as.matrix(HolzingerSwineford1939[, paste0("x", 1:9)])
 
-stopifnot(is.matrix(big5_std))
+J <- ncol(hs)
+N <- nrow(hs)
+Q <- 3
+C <- 9
 
-test_that("IS original works", {
-  set.seed(10)
-
+test_that("is.seafar_original() returns the IS components", {
   IS <- is.seafar_original(
-    data = big5_std,
-    nfactors = 5,
-    C = 240,
-    INIT = "mixed",
+    data = hs,
+    nfactors = Q,
+    C = 9,
+    INIT = "svd",
     orthogonal = TRUE,
-    nstarts = 5
+    nstarts = 1
   )
 
   expect_type(IS, "list")
-  expect_true(all(c("value", "vaf", "propzero", "smallestP", "maxsdP") %in% names(IS)))
-  expect_true(is.numeric(IS$value))
+  expect_named(
+    IS,
+    c("value", "vaf", "propzero", "smallestP", "maxsdP", "center", "scale")
+  )
+
+  expect_true(is.numeric(IS$value) && length(IS$value) == 1)
+  expect_gt(IS$value, 0)
+  expect_gt(IS$vaf, 0)
+  expect_lte(IS$vaf, 1)
+
 })
 
-test_that("IS modified works", {
-  set.seed(10)
+test_that("is.seafar() returns a single total cardinality", {
 
-  IS_mod <- is.seafar(
-    data = big5_std,
-    nfactors = 5,
+  selcard <- is.seafar(
+    data = hs,
+    nfactors = Q,
+    INIT = "svd",
+    orthogonal = TRUE,
+    nstarts = 1
+  )
+
+  expect_s3_class(selcard, "is_seafar")
+  expect_true(is.numeric(selcard))
+  expect_length(selcard, 1)
+
+  expect_equal(unname(unclass(selcard)), 25)
+})
+
+
+test_that("summary.is_seafar() prints the selected cardinality", {
+  selcard <- is.seafar(
+    data = hs,
+    nfactors = Q,
     INIT = "svd",
     orthogonal = TRUE,
     nstarts = 1,
-    TOL = 3,
-    THR = .2
+    THR = 0.2
   )
 
-  expect_s3_class(IS_mod, "is_seafar")
-
-  expect_true(
-    is.numeric(IS_mod) &&
-      (length(IS_mod) == 1 || length(IS_mod) > 1)
+  expect_output(
+    summary(selcard),
+    "The cardinality selected by the Index of Sparseness is: 12"
   )
-
-  expect_equal(unname(IS_mod), rep(46, 5))
 })
