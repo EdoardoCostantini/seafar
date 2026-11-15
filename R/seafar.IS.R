@@ -31,10 +31,14 @@
 #' \dontrun{
 #' IS_result <- seafar.IS(
 #'   data = X,
-#'   nfactors = 5,
-#'   warmstart = TRUE,
+#'   nfactors = 3,
+#'   warmstart = FALSE,
+#'   nstarts = 100,
+#'   nstarts.tune = 25,
 #'   card.length = 100
 #' )
+#' summary(IS_result)
+#' summary(IS_result$selmodel)
 #' }
 seafar.IS <- function(data,
                       nfactors,

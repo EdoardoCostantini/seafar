@@ -29,7 +29,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' big5_seafa <- seafar(USArrests, 2, 4, INIT = "random", orthogonal = TRUE, nstarts = 50)
+#' fit <- seafar(data = X, nfactors = 3, C = 9, INIT = "random", orthogonal = TRUE, nstarts = 50)
+#' summary(fit)
 #' }
 seafar <- function(data,
                    nfactors,
@@ -149,7 +150,7 @@ seafar <- function(data,
 #'
 #' @examples
 #' \dontrun{
-#' big5_seafa <- seafar(ocean, 5, 240, INIT = "svd")
+#' fit_ortho <- seafar_orthogonal(data = X, nfactors = 3, C = 9, INIT = "svd")
 #' }
 seafar_orthogonal <- function(data,
                               nfactors,
@@ -302,7 +303,7 @@ seafar_orthogonal <- function(data,
 #'
 #' @examples
 #' \dontrun{
-#' big5_seafa <- seafar(ocean, 5, 240, INIT = "svd")
+#' fit <- seafar_orthogonal(data = X, nfactors = 3, C = 9, INIT = "svd")
 #' }
 seafar_general <- function(data,
                            nfactors,
@@ -461,7 +462,7 @@ seafar_general <- function(data,
 #' @param ...  Argument to be passed to or from other methods.
 #' @examples
 #' \dontrun{
-#' summary(big5_result, disp = "full")
+#' summary(fit)
 #' }
 #' @export
 summary.seafar <- function(object, disp = "loadings", nrow = 10, ...) {

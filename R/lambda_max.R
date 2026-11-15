@@ -17,8 +17,8 @@
 #' @examples
 #'\dontrun{
 #' max_lambda <- lambda_max(
-#'   data = scale(big5),
-#'   nfactors = 5,
+#'   data = X,
+#'   nfactors = 3,
 #'   INIT = 'semirational')
 #'}
 lambda_max <- function(data,

@@ -12,9 +12,10 @@
 #'
 #' @examples
 #' \dontrun{
-#' data(big5, package = "qgraph")
-#' X <- scale(big5)
-#' a <- factor_retention(X, large.data = FALSE)
+#' nfactors <- factor_retention(
+#'   data = X,
+#'   large.data = FALSE
+#' )
 #' }
 factor_retention <- function(data,
                              large.data = FALSE) {
@@ -36,9 +37,7 @@ factor_retention <- function(data,
 #'
 #' @examples
 #' \dontrun{
-#' data(big5, package = "qgraph")
-#' X <- scale(big5)
-#' a <- factor_small(X)
+#' nfactors <- factor_small(data = X)
 #' }
 factor_small <- function(data) {
   data <- scale(data, center = TRUE, scale = TRUE)
@@ -80,9 +79,7 @@ factor_small <- function(data) {
 #'
 #' @examples
 #' \dontrun{
-#' data(big5, package = "qgraph")
-#' X <- scale(big5)
-#' a <- factor_large(X)
+#' nfactors <- factor_large(data = X)
 #' }
 factor_large <- function(data) {
   data <- scale(data, center = TRUE, scale = TRUE)
