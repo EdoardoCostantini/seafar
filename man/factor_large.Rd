@@ -17,8 +17,6 @@ Function to retain number of factors/components for very large data set using va
 }
 \examples{
 \dontrun{
-data(big5, package = "qgraph")
-X <- scale(big5)
-a <- factor_large(X)
+nfactors <- factor_large(data = X)
 }
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/seafar_lasso.R
 \name{seafar_lasso}
 \alias{seafar_lasso}
-\title{Title Sparse exploratory approximate factor analysis using LASSO penalty}
+\title{Sparse exploratory approximate factor analysis using LASSO penalty}
 \usage{
 seafar_lasso(
   data,
@@ -12,12 +12,14 @@ seafar_lasso(
   eps = 10^-4,
   INIT = "semirational",
   initloadings = NULL,
+  nstarts = 50,
+  show_progress = FALSE,
   standardize = TRUE,
-  pattern = NULL
+  unshrink = TRUE
 )
 }
 \arguments{
-\item{data}{A data matrix containing the dataset.}
+\item{data}{A data frame or matrix (NxJ). Data are always centered internally.}
 
 \item{nfactors}{The number of factors.}
 
@@ -29,23 +31,50 @@ seafar_lasso(
 
 \item{INIT}{Method to initialize loadings.}
 
-\item{initloadings}{Optional user-supplied initial loading matrix.}
+\item{initloadings}{Initial loading matrix if available.}
 
-\item{standardize}{Logical. If \code{TRUE} (default) variables are scaled to unit variance after centering.
-Centering is applied regardless.}
+\item{nstarts}{Number of starts, default is 50. Only one start is run if \code{initloadings} is provided
+or \code{INIT = "svd"}, because every start would be identical.}
 
-\item{pattern}{Optional JxQ matrix; loadings where \code{pattern} is 0 (or \code{FALSE}) are fixed at zero.
-With \code{lambda = 0} this refits a given zero pattern without shrinkage (used by \code{unshrink} in
-\code{seafar_lasso_multistart()}).}
+\item{show_progress}{Option of print progress bar, default is FALSE.}
+
+\item{standardize}{Logical. If \code{TRUE} (default), items are scaled to unit variance (N denominator)
+after centering. Centering is applied regardless.}
+
+\item{unshrink}{Logical. If \code{TRUE} (default), the zero pattern of the best solution is refitted with
+\code{lambda = 0} (warm-started from that solution) to remove the shrinkage of the nonzero loadings.}
 }
 \value{
-Factor loading and factor score matrices.
+A list with
+\item{loadings}{The best estimated loading matrix (unshrunk if \code{unshrink = TRUE}).}
+\item{scores}{The best estimated factor score matrix (from the unshrunk refit if \code{unshrink = TRUE}).}
+\item{Lossvec}{A list of vectors of loss values of each successful start (lasso fits).}
+\item{Loss}{Loss value of the best start; the residual sum of squares of the refit if \code{unshrink = TRUE}.}
+\item{PVE}{Proportion of variance explained by the returned loadings and scores (no penalty term included).}
+\item{lambda}{The LASSO penalty tuning parameter used.}
+\item{all_losses}{Penalized loss of every successful start (lasso fits).}
+\item{n_best}{Number of starts that reached the lowest lasso loss (within 0.01).}
+\item{n_distinct}{Number of distinct lasso loss values across starts.}
+\item{converged}{Whether the returned solution converged (the refit if \code{unshrink = TRUE}).}
+\item{center}{Item means used to center the data.}
+\item{scale}{Item standard deviations used to scale the data (1s if \code{standardize = FALSE}).}
+\item{loadings_lasso, scores_lasso, Loss_lasso}{If \code{unshrink = TRUE}: the original lasso solution that
+defined the zero pattern, and its penalized loss.}
 }
 \description{
-Title Sparse exploratory approximate factor analysis using LASSO penalty
+Function for exploratory approximate factor analysis with a LASSO penalty on the loadings,
+resulting in a sparse measurement model. The model is fitted from multiple starting values
+and the solution with the lowest loss is returned.
 }
 \examples{
 \dontrun{
-fit.seafar <- seafar_lasso(USArrests, 2, lambda = 10, INIT = "svd")
+fit <- seafar_lasso(
+  data = X,
+  nfactors = 3,
+  lambda = 10,
+  INIT = "random",
+  nstarts = 50
+)
+summary(fit)
 }
 }

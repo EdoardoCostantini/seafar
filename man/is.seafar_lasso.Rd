@@ -12,6 +12,7 @@ is.seafar_lasso(
   eps = 10^-4,
   INIT = if (warmstart) "rational" else "semirational",
   nstarts = 50,
+  nstarts.tune = nstarts,
   lambda.length = 50,
   standardize = TRUE
 )
@@ -30,7 +31,10 @@ is.seafar_lasso(
 \item{INIT}{Method to initialize loading matrix. The default is \code{"rational"} if \code{warmstart = TRUE}
 and \code{"semirational"} if \code{warmstart = FALSE}.}
 
-\item{nstarts}{Number of starts for fitting the selected model and, if \code{warmstart = FALSE}, for model selection.}
+\item{nstarts}{Number of starts for refitting the model with the selected value, default is 50.}
+
+\item{nstarts.tune}{Number of starts for each candidate value during model selection. Only used if
+\code{warmstart = FALSE}; with warm starts every candidate is fitted once. Defaults to \code{nstarts}.}
 
 \item{lambda.length}{Number of candidate lambda values to evaluate.}
 
@@ -40,7 +44,7 @@ after centering. Centering is applied regardless.}
 \value{
 A list with
 \item{sellambda}{The selected LASSO penalty parameter.}
-\item{selmodel}{The output of \code{seafar_lasso_multistart()} fitted with the selected penalty.}
+\item{selmodel}{The output of \code{seafar_lasso()} fitted with the selected penalty.}
 \item{pve}{Proportion of variance explained by the selected model.}
 \item{pvepca}{Proportion of variance explained by the unconstrained model (first nfactors principal components).}
 }
@@ -59,16 +63,12 @@ path stops at the first penalty that leaves fewer than 3 nonzero loadings on a f
 \dontrun{
 IS_result <- is.seafar_lasso(
   data = X,
-  nfactors = 5,
-  nstarts = 50)
+  nfactors = 3,
+  warmstart = FALSE,
+  nstarts = 100,
+  nstarts.tune = 10)
 summary(IS_result)
 summary(IS_result$selmodel)
 
-# slower, using multiple starts for every candidate penalty
-IS_result <- is.seafar_lasso(
-  data = X,
-  nfactors = 5,
-  warmstart = FALSE,
-  nstarts = 50)
 }
 }

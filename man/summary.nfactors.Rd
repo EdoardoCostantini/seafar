@@ -19,7 +19,7 @@ Display a summary of the results of \code{factor_retention()}.
 }
 \examples{
 \dontrun{
-results <- factor_retention(X)
+results <- factor_retention(data = X)
 summary(results)
 }
 }

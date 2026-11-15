@@ -2,7 +2,7 @@
 % Please edit documentation in R/is.seafar.R
 \name{is.seafar}
 \alias{is.seafar}
-\title{Model selection for SEAFAR using modified Index of Sparseness
+\title{Model selection for SEAFAR using Index of Sparseness
 (Van Deun et al., 2026).}
 \usage{
 is.seafar(
@@ -47,7 +47,7 @@ after centering. Centering is applied regardless.}
 The selected cardinality value.
 }
 \description{
-Model selection for SEAFAR using modified Index of Sparseness
+Model selection for SEAFAR using Index of Sparseness
 (Van Deun et al., 2026).
 }
 \examples{
@@ -61,5 +61,6 @@ selcard <- is.seafar(
   TOL = 2,
   THR = 0.15
 )
+summary(selcard)
 }
 }

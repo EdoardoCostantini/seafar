@@ -53,8 +53,8 @@ Model selection for SEAFAR using the Index of Sparseness.
 \dontrun{
 IS <- is.seafar_original(
   data = X,
-  nfactors = 5,
-  C = 240,
+  nfactors = 3,
+  C = 9,
   INIT = "random",
   orthogonal = TRUE,
   nstarts = 50

@@ -47,6 +47,6 @@ measurement model for non-orthogonal factors.
 }
 \examples{
 \dontrun{
-big5_seafa <- seafar(ocean, 5, 240, INIT = "svd")
+fit <- seafar_orthogonal(data = X, nfactors = 3, C = 9, INIT = "svd")
 }
 }

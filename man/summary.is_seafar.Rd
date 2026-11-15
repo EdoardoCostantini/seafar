@@ -19,6 +19,6 @@ Display a summary of the results of \code{is.seafar()}.
 }
 \examples{
 \dontrun{
-summary(IS_result)
+summary(selcard)
 }
 }
