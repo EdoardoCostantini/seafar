@@ -133,6 +133,7 @@ is.seafar_wst <- function(data,
 #' \dontrun{
 #' summary(IS_result)
 #' }
+#' @export
 summary.ISwarmstart <- function(object, ...) {
   cat(sprintf(
     "The cardinality selected by the Index of Sparseness is: %s\n",

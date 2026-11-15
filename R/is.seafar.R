@@ -224,12 +224,12 @@ is.seafar <- function(data,
 #' @param ... Argument to be passed to or from other methods.
 #'
 #' @returns Summary of the results.
-#' @export
 #'
 #' @examples
 #' \dontrun{
 #' summary(IS_result)
 #' }
+#' @export
 summary.is_seafar <- function(object, ...) {
   selcard <- if (is.list(object)) object$selcard else object
   cat(sprintf(

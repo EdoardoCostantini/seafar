@@ -10,6 +10,7 @@
 #' results <- factor_retention(X)
 #' summary(results)
 #' }
+#' @export
 summary.nfactors <- function(object, ...) {
   if (is.null(object$kaiser)) {
     cat(sprintf(

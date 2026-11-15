@@ -463,6 +463,7 @@ seafar_general <- function(data,
 #' \dontrun{
 #' summary(big5_result, disp = "full")
 #' }
+#' @export
 summary.seafar <- function(object, disp = "loadings", nrow = 10, ...) {
   if (missing(disp)) {
     disp <- "loadings"

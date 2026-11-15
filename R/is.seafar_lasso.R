@@ -356,6 +356,7 @@ retry_lasso <- function(fit, what, lambda, times = 10) {
 #' \dontrun{
 #' summary(IS_result)
 #' }
+#' @export
 summary.is_seafar_lasso <- function(object, ...) {
   cat(sprintf(
     "The LASSO penalty selected by the Index of Sparseness is: %.3f\n",
