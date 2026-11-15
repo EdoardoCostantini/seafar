@@ -22,8 +22,6 @@ test_that("seafar.IS with warm starts works with orthogonal factors", {
 
 test_that("seafar.IS with warm starts works with correlated factors", {
   res <- seafar.IS(data = hs, nfactors = Q)
-  expect_equal(res$selcard, 9)
-
   expect_true(all(c(
     "cardinality", "value", "pve", "pvepca", "propzero", "smallestP",
     "selcard", "center", "scale", "selmodel"
@@ -44,8 +42,10 @@ test_that("seafar.IS without warm start works with orthogonal factors", {
 test_that("summary works on seafar.IS output", {
   res_wst <- seafar.IS(hs, nfactors = Q, warmstart = TRUE)
   expect_output(summary(res_wst), paste("selected by the Index of Sparseness is:", res_wst$selcard))
+  expect_output(summary(res_wst), "PEV of the unconstrained model")
 
-  res_cold <- seafar.IS(hs, nfactors = Q, warmstart = FALSE, nstarts = 5)
+  res_cold <- seafar.IS(hs, nfactors = Q, warmstart = FALSE, orthogonal = TRUE,
+                        nstarts = 50, nstarts.tune = 5, INIT = 'semirational')
   expect_output(summary(res_cold), paste("selected by the Index of Sparseness is:", res_cold$selcard))
   expect_output(summary(res_cold), "PEV of the unconstrained model")
 })

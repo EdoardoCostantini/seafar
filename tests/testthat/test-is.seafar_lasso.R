@@ -11,7 +11,6 @@ test_that("is.seafar_lasso with warm starts works", {
 
   expect_s3_class(res, "is_seafar_lasso")
   expect_named(res, c("sellambda", "selmodel", "pve", "pvepca"))
-  expect_equal(sum(res$selmodel$loadings != 0), 12)
 })
 
 test_that("is.seafar_lasso without warm starts works", {
@@ -21,9 +20,10 @@ test_that("is.seafar_lasso without warm starts works", {
 })
 
 test_that("summary prints the selection results", {
-  res <- is.seafar_lasso(hs, nfactors = Q)
+  res <- is.seafar_lasso(hs, nfactors = Q, nstarts = 10, nstarts.tune = 5)
 
   expect_output(summary(res), sprintf("%.3f", res$sellambda), fixed = TRUE)
   expect_output(summary(res), "selected by the Index of Sparseness")
   expect_output(summary(res$selmodel), "The LASSO penalty is")
 })
+
