@@ -33,7 +33,6 @@ factor_retention <- function(data,
 #' @param data A NxJ matrix of observed variables.
 #'
 #' @returns Number of factors/components.
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -78,7 +77,6 @@ factor_small <- function(data) {
 #' @param data A NxJ matrix of observed variables.
 #'
 #' @returns Number of factors/components.
-#' @export
 #'
 #' @examples
 #' \dontrun{
