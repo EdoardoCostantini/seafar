@@ -1,23 +1,25 @@
-testthat::skip_if_not_installed("qgraph")
+testthat::skip_if_not_installed("lavaan")
 
-data("big5", package = "qgraph")
-big5_std <- as.matrix(scale(big5))
+data("HolzingerSwineford1939", package = "lavaan")
+hs <- as.matrix(HolzingerSwineford1939[, paste0("x", 1:9)])
 
-stopifnot(is.matrix(big5_std))
+J <- ncol(hs)
+N <- nrow(hs)
+Q <- 3
+C <- 9
 
 test_that("IS with warm starts works", {
-  set.seed(10)
-
-  IS_warmstart <- is.seafar_wst(
-    data = big5_std,
-    nfactors = 5,
-    INIT = "rational",
-    card.length = 100
+  res <- is.seafar_wst(
+    data = hs,
+    nfactors = Q
   )
 
-  expect_s3_class(IS_warmstart, "ISwarmstart")
-  expect_type(IS_warmstart, "list")
-  expect_true(all(c("cardinality", "value", "pve", "propzero", "smallestP", "selcard") %in% names(IS_warmstart)))
+  expect_s3_class(res, "ISwarmstart")
+  expect_type(res, "list")
+  expect_true(all(c(
+    "cardinality", "value", "pve", "pvepca", "propzero", "smallestP",
+    "selcard", "center", "scale"
+  ) %in% names(res)))
 
-  expect_equal(IS_warmstart$selcard, 290)
+  expect_equal(res$selcard, 9)
 })
