@@ -143,7 +143,7 @@ enough_items <- function(loadings,
 #'
 #' @examples
 #'\dontrun{
-#' P <- seafar_lasso_multistart(
+#' P <- seafar_lasso(
 #'   scale(big5),
 #'   nfactors = 5,
 #'   lambda = 10,
@@ -159,7 +159,7 @@ fit_once <- function(data,
                      nstarts = 1,
                      standardize = TRUE){
   INIT <- check_init(INIT)
-  fit <- seafar_lasso_multistart(data = data,
+  fit <- seafar_lasso(data = data,
                                  nfactors = nfactors,
                                  maxiter = maxiter,
                                  eps = eps,
