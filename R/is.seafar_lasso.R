@@ -16,7 +16,6 @@
 #' \item{propzero}{Proportion of zero loadings.}
 #' \item{smallestP}{Smallest nonzero loading.}
 #' \item{maxsdP}{Maximum standard deviation of loading.}
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -52,7 +51,7 @@ IS_lasso <- function(data,
     data <- scale(data, center = FALSE, scale = xscale)
   }
 
-  VarSelect0 <- seafar_lasso_multistart(
+  VarSelect0 <- seafar_lasso(
     data = data,
     nfactors = nfactors,
     lambda = 0,
@@ -69,7 +68,7 @@ IS_lasso <- function(data,
   V_oo <- sum(data^2)
   V_s <- sum((T_hat0 %*% t(P_hat0))^2)
 
-  VarSelect <- seafar_lasso_multistart(
+  VarSelect <- seafar_lasso(
     data = data,
     nfactors = nfactors,
     lambda = lambda,
@@ -123,14 +122,16 @@ is_lasso_stats <- function(P_hat, T_hat, V_s, V_oo) {
 #' @param eps Convergence criterion based on difference in loss between iterates.
 #' @param INIT Method to initialize loading matrix. The default is \code{"rational"} if \code{warmstart = TRUE}
 #'   and \code{"semirational"} if \code{warmstart = FALSE}.
-#' @param nstarts Number of starts for fitting the selected model and, if \code{warmstart = FALSE}, for model selection.
+#' @param nstarts Number of starts for refitting the model with the selected value, default is 50.
+#' @param nstarts.tune Number of starts for each candidate value during model selection. Only used if
+#'   \code{warmstart = FALSE}; with warm starts every candidate is fitted once. Defaults to \code{nstarts}.
 #' @param lambda.length Number of candidate lambda values to evaluate.
 #' @param standardize Logical. If \code{TRUE} (default), items are scaled to unit variance (N denominator)
 #'   after centering. Centering is applied regardless.
 #'
 #' @returns A list with
 #' \item{sellambda}{The selected LASSO penalty parameter.}
-#' \item{selmodel}{The output of \code{seafar_lasso_multistart()} fitted with the selected penalty.}
+#' \item{selmodel}{The output of \code{seafar_lasso()} fitted with the selected penalty.}
 #' \item{pve}{Proportion of variance explained by the selected model.}
 #' \item{pvepca}{Proportion of variance explained by the unconstrained model (first nfactors principal components).}
 #' @export
@@ -139,17 +140,13 @@ is_lasso_stats <- function(P_hat, T_hat, V_s, V_oo) {
 #'\dontrun{
 #' IS_result <- is.seafar_lasso(
 #'   data = X,
-#'   nfactors = 5,
-#'   nstarts = 50)
+#'   nfactors = 3,
+#'   warmstart = FALSE,
+#'   nstarts = 100,
+#'   nstarts.tune = 10)
 #' summary(IS_result)
 #' summary(IS_result$selmodel)
 #'
-#' # slower, using multiple starts for every candidate penalty
-#' IS_result <- is.seafar_lasso(
-#'   data = X,
-#'   nfactors = 5,
-#'   warmstart = FALSE,
-#'   nstarts = 50)
 #'}
 is.seafar_lasso <- function(data,
                             nfactors,
@@ -158,6 +155,7 @@ is.seafar_lasso <- function(data,
                             eps = 10^-4,
                             INIT = if (warmstart) "rational" else "semirational",
                             nstarts = 50,
+                            nstarts.tune = nstarts,
                             lambda.length = 50,
                             standardize = TRUE) {
   INIT <- check_init(INIT)
@@ -204,7 +202,7 @@ is.seafar_lasso <- function(data,
             maxiter = maxiter,
             eps = eps,
             INIT = INIT,
-            nstarts = nstarts,
+            nstarts = nstarts.tune,
             standardize = standardize
           )
         },
@@ -222,7 +220,7 @@ is.seafar_lasso <- function(data,
 
   selmodel <- retry_lasso(
     function() {
-      seafar_lasso_multistart(
+      seafar_lasso(
         data = data,
         nfactors = nfactors,
         lambda = sel_lasso,
@@ -233,7 +231,7 @@ is.seafar_lasso <- function(data,
         standardize = standardize
       )
     },
-    what = "seafar_lasso_multistart",
+    what = "seafar_lasso",
     lambda = sel_lasso
   )
 
@@ -275,7 +273,7 @@ is_lasso_path <- function(data, nfactors, lasso_vec, maxiter, eps, INIT, standar
 
   fit0 <- retry_lasso(
     function() {
-      seafar_lasso(
+      seafar_lasso_single(
         data = data,
         nfactors = nfactors,
         lambda = 0,
@@ -285,7 +283,7 @@ is_lasso_path <- function(data, nfactors, lasso_vec, maxiter, eps, INIT, standar
         standardize = FALSE # data already preprocessed above
       )
     },
-    what = "seafar_lasso",
+    what = "seafar_lasso_single",
     lambda = 0
   )
 
@@ -295,7 +293,7 @@ is_lasso_path <- function(data, nfactors, lasso_vec, maxiter, eps, INIT, standar
 
   avec <- lasso_is_table(length(lasso_vec))
   for (k in seq_along(lasso_vec)) {
-    fit <- seafar_lasso(
+    fit <- seafar_lasso_single(
       data = data,
       nfactors = nfactors,
       lambda = lasso_vec[k],
@@ -352,12 +350,12 @@ retry_lasso <- function(fit, what, lambda, times = 10) {
 #' @param ... Argument to be passed to or from other methods.
 #'
 #' @returns Summary of the results.
-#' @export
 #'
 #' @examples
 #' \dontrun{
 #' summary(IS_result)
 #' }
+#' @export
 summary.is_seafar_lasso <- function(object, ...) {
   cat(sprintf(
     "The LASSO penalty selected by the Index of Sparseness is: %.3f\n",

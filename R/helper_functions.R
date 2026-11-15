@@ -4,7 +4,6 @@
 #' @param C_c Number of zero loadings.
 #'
 #' @returns Loadings with exactly C_c nonzero loadings.
-#' @export
 #' @author Katrijn Van Deun
 #'
 #' @examples
@@ -27,7 +26,6 @@ hardthr <- function(loadings, C_c) {
 #' @param loadings Loadings matrix JxQ.
 #'
 #' @returns Sum of squared residuals.
-#' @export
 #' @author Katrijn Van Deun.
 #'
 #' @examples
@@ -47,7 +45,6 @@ ssres <- function(data, scores, loadings) {
 #' @param loadings Loadings matrix JxQ.
 #'
 #' @returns Orthogonal factor scores matrix NxJ.
-#' @export
 #' @author Katrijn Van Deun.
 #'
 #' @examples
@@ -73,7 +70,6 @@ orthprocr <- function(data, loadings) {
 #' @param eps Tolerance for difference in loss.
 #'
 #' @returns Orthogonal factor scores matrix NxJ.
-#' @export
 #' @author Katrijn Van Deun.
 #'
 #' @examples
@@ -141,7 +137,7 @@ oblprocr <- function(data, scores, loadings, maxiter, eps){
 #' @param eps Tolerance for difference in loss.
 #'
 #' @returns Orthogonal factor scores matrix NxJ.
-#' @export
+#'
 #'
 #' @examples
 #' \dontrun{
@@ -230,7 +226,7 @@ seafar_init <- function(data,
     B <- pstr(P, TARGET, WEIGHTS, 50, 1e-4)
     P <- P %*% B$Bmatrix
   } else {
-    P <- P2 * 0.8 + P1 * 0.2
+    P <- P2 * 0.7 + P1 * 0.3
   }
   if (length(C) > 1) {
     C_c <- J - C
@@ -330,7 +326,7 @@ pstr <- function(loadings, target, weights, maxiter = 50, eps = 1e-4) {
 #' @param m Number of factors.
 #'
 #' @returns Matrix of reflections.
-#' @export
+#'
 #'
 #' @author Katrijn Van Deun and Zhengguo Gu.
 #' @examples
@@ -363,7 +359,7 @@ reflexmat <- function(m) {
 #' @param weights Weight.
 #'
 #' @returns Loss value.
-#' @export
+#'
 #'
 #' @examples
 #' \dontrun{
@@ -385,7 +381,7 @@ pstrLoss <- function(B, Tmat, target, weights) {
 #' @param lambda LASSO penalty tuning parameter.
 #'
 #' @returns Loss value when using LASSO penalty.
-#' @export
+#'
 #'
 #' @examples
 #' \dontrun{

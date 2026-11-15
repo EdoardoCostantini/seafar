@@ -21,6 +21,6 @@ Display a summary of the results of \code{seafar()}.
 }
 \examples{
 \dontrun{
-summary(big5_result, disp = "full")
+summary(fit)
 }
 }

@@ -8,7 +8,9 @@
 #' @param INIT Method to initialize loading matrix. The default is \code{"rational"} if \code{warmstart = TRUE}
 #'   and \code{"semirational"} if \code{warmstart = FALSE}.
 #' @param orthogonal Orthogonal or non-orthogonal factors, default is FALSE.
-#' @param nstarts Number of starts for fitting the selected model and, if \code{warmstart = FALSE}, for model selection.
+#' @param nstarts Number of starts for refitting the model with the selected value, default is 50.
+#' @param nstarts.tune Number of starts for each candidate value during model selection. Only used if
+#'   \code{warmstart = FALSE}; with warm starts every candidate is fitted once. Defaults to \code{nstarts}.
 #' @param TOL Number of decimals used to decide whether two PEV values are the same. Only used if \code{warmstart = FALSE}.
 #' @param THR Thresholding selection for the smallest nonzero loading. Only used if \code{warmstart = FALSE}.
 #' @param card.length Number of candidate cardinality values to test, default is 100.
@@ -29,10 +31,14 @@
 #' \dontrun{
 #' IS_result <- seafar.IS(
 #'   data = X,
-#'   nfactors = 5,
-#'   warmstart = TRUE,
+#'   nfactors = 3,
+#'   warmstart = FALSE,
+#'   nstarts = 100,
+#'   nstarts.tune = 25,
 #'   card.length = 100
 #' )
+#' summary(IS_result)
+#' summary(IS_result$selmodel)
 #' }
 seafar.IS <- function(data,
                       nfactors,
@@ -42,6 +48,7 @@ seafar.IS <- function(data,
                       INIT = if (warmstart) "rational" else "semirational",
                       orthogonal = FALSE,
                       nstarts = 50,
+                      nstarts.tune = nstarts,
                       TOL = 3,
                       THR = 0.03,
                       card.length = 100,
@@ -67,7 +74,7 @@ seafar.IS <- function(data,
       eps = eps,
       INIT = INIT,
       orthogonal = orthogonal,
-      nstarts = nstarts,
+      nstarts = nstarts.tune,
       TOL = TOL,
       THR = THR,
       standardize = standardize,

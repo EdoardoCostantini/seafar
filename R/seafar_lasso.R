@@ -1,4 +1,186 @@
-#' Title Sparse exploratory approximate factor analysis using LASSO penalty
+#' Sparse exploratory approximate factor analysis using LASSO penalty
+#'
+#' Function for exploratory approximate factor analysis with a LASSO penalty on the loadings,
+#' resulting in a sparse measurement model. The model is fitted from multiple starting values
+#' and the solution with the lowest loss is returned.
+#'
+#' @param data A data frame or matrix (NxJ). Data are always centered internally.
+#' @param nfactors The number of factors.
+#' @param lambda LASSO penalty tuning parameter.
+#' @param maxiter Maximum number of iterations of the AO procedure.
+#' @param eps Convergence criterion based on difference in loss between iterates.
+#' @param INIT Method to initialize loadings.
+#' @param initloadings Initial loading matrix if available.
+#' @param nstarts Number of starts, default is 50. Only one start is run if \code{initloadings} is provided
+#'   or \code{INIT = "svd"}, because every start would be identical.
+#' @param show_progress Option of print progress bar, default is FALSE.
+#' @param standardize Logical. If \code{TRUE} (default), items are scaled to unit variance (N denominator)
+#'   after centering. Centering is applied regardless.
+#' @param unshrink Logical. If \code{TRUE} (default), the zero pattern of the best solution is refitted with
+#'   \code{lambda = 0} (warm-started from that solution) to remove the shrinkage of the nonzero loadings.
+#'
+#' @returns A list with
+#' \item{loadings}{The best estimated loading matrix (unshrunk if \code{unshrink = TRUE}).}
+#' \item{scores}{The best estimated factor score matrix (from the unshrunk refit if \code{unshrink = TRUE}).}
+#' \item{Lossvec}{A list of vectors of loss values of each successful start (lasso fits).}
+#' \item{Loss}{Loss value of the best start; the residual sum of squares of the refit if \code{unshrink = TRUE}.}
+#' \item{PVE}{Proportion of variance explained by the returned loadings and scores (no penalty term included).}
+#' \item{lambda}{The LASSO penalty tuning parameter used.}
+#' \item{all_losses}{Penalized loss of every successful start (lasso fits).}
+#' \item{n_best}{Number of starts that reached the lowest lasso loss (within 0.01).}
+#' \item{n_distinct}{Number of distinct lasso loss values across starts.}
+#' \item{converged}{Whether the returned solution converged (the refit if \code{unshrink = TRUE}).}
+#' \item{center}{Item means used to center the data.}
+#' \item{scale}{Item standard deviations used to scale the data (1s if \code{standardize = FALSE}).}
+#' \item{loadings_lasso, scores_lasso, Loss_lasso}{If \code{unshrink = TRUE}: the original lasso solution that
+#'   defined the zero pattern, and its penalized loss.}
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' fit <- seafar_lasso(
+#'   data = X,
+#'   nfactors = 3,
+#'   lambda = 10,
+#'   INIT = "random",
+#'   nstarts = 50
+#' )
+#' summary(fit)
+#' }
+seafar_lasso <- function(data,
+                         nfactors,
+                         lambda,
+                         maxiter = 50,
+                         eps = 10^-4,
+                         INIT = "semirational",
+                         initloadings = NULL,
+                         nstarts = 50,
+                         show_progress = FALSE,
+                         standardize = TRUE,
+                         unshrink = TRUE) {
+  INIT <- check_init(INIT)
+  if (!is.null(initloadings) || INIT == "svd") {
+    nstarts <- 1 # every start would be identical
+  }
+
+  Pout3d <- list()
+  Tout3d <- list()
+  LOSS <- array()
+  LOSSvec <- list()
+  converged <- array()
+  if (show_progress == TRUE) {
+    pb <- txtProgressBar(min = 0, max = nstarts, style = 3)
+  }
+
+  valid_index <- 0 # counts only successful runs
+  last_error <- NULL
+
+  for (n in 1:nstarts) {
+    # catch when a start throws an error to skip that start
+    result <- tryCatch(
+      {
+        seafar_lasso_single(
+          data = data,
+          nfactors = nfactors,
+          lambda = lambda,
+          maxiter = maxiter,
+          eps = eps,
+          INIT = INIT,
+          initloadings = initloadings,
+          standardize = standardize
+        )
+      },
+      error = function(e) {
+        last_error <<- conditionMessage(e)
+        return(NULL)
+      }
+    )
+
+    # Skip failed runs
+    if (is.null(result)) {
+      if (show_progress) setTxtProgressBar(pb, n)
+      next
+    }
+
+    # Store successful run
+    valid_index <- valid_index + 1
+    Pout3d[[valid_index]] <- result$loadings
+    Tout3d[[valid_index]] <- result$scores
+    LOSS[valid_index] <- result$Residual
+    LOSSvec[[valid_index]] <- 1 - result$PVE
+    converged[valid_index] <- result$converged
+    xcenter <- result$center # same for every start; taken from a successful run
+    xscale <- result$scale
+
+    if (show_progress) setTxtProgressBar(pb, n)
+  }
+
+  if (show_progress == TRUE) close(pb)
+
+  if (valid_index == 0) {
+    stop("all ", nstarts, " starts failed; the last error was: ", last_error)
+  }
+  if (valid_index < nstarts) {
+    warning(nstarts - valid_index, " of ", nstarts, " starts failed and were skipped")
+  }
+
+  # check how many times the minimum loss was achieved
+  best <- min(LOSS)
+  tol <- 1e-2
+  n_best <- sum(abs(LOSS - best) < tol)
+  n_distinct <- length(unique(round(LOSS, 2)))
+
+  # choose solution with lowest loss value
+  k <- which(LOSS == min(LOSS))
+  if (length(k) > 1) {
+    pos <- sample(1:length(k), 1)
+    k <- k[pos]
+  }
+
+  return_varselect <- list()
+  return_varselect$loadings <- Pout3d[[k]]
+  return_varselect$scores <- Tout3d[[k]]
+  return_varselect$Lossvec <- LOSSvec
+  return_varselect$Loss <- LOSS[k]
+  return_varselect$all_losses <- LOSS
+  return_varselect$n_best <- n_best
+  return_varselect$n_distinct <- n_distinct
+  return_varselect$converged <- converged[k]
+  return_varselect$lambda <- lambda
+  return_varselect$center <- xcenter
+  return_varselect$scale <- xscale
+
+  # undo shrinkage: refit the zero pattern of the best start with lambda = 0, warm-started from it
+  if (unshrink) {
+    refit <- seafar_lasso_single(data = data,
+                                 nfactors = nfactors,
+                                 lambda = 0,
+                                 maxiter = maxiter,
+                                 eps = eps,
+                                 initloadings = Pout3d[[k]],
+                                 standardize = standardize,
+                                 pattern = Pout3d[[k]])
+
+    return_varselect$loadings <- refit$loadings
+    return_varselect$scores <- refit$scores
+    return_varselect$Loss <- refit$Residual
+    return_varselect$loadings_lasso <- Pout3d[[k]] # keep the shrunk solution the pattern came from
+    return_varselect$scores_lasso <- Tout3d[[k]]
+    return_varselect$Loss_lasso <- LOSS[k]
+    return_varselect$converged <- refit$converged
+  }
+
+  # computed directly because the PVE of a lasso fit has the penalty included in its loss
+  data_scaled <- scale(data, center = return_varselect$center, scale = return_varselect$scale)
+  return_varselect$PVE <- 1 - ssres(data_scaled, return_varselect$scores, return_varselect$loadings) / sum(data_scaled^2)
+
+  attr(return_varselect, "class") <- "seafar_lasso"
+
+  return(return_varselect)
+}
+
+#' Single start of sparse exploratory approximate factor analysis using LASSO penalty
 #'
 #' @param data A data matrix containing the dataset.
 #' @param nfactors The number of factors.
@@ -11,22 +193,30 @@
 #'    Centering is applied regardless.
 #' @param pattern Optional JxQ matrix; loadings where \code{pattern} is 0 (or \code{FALSE}) are fixed at zero.
 #'    With \code{lambda = 0} this refits a given zero pattern without shrinkage (used by \code{unshrink} in
-#'    \code{seafar_lasso_multistart()}).
+#'    \code{seafar_lasso()}).
 #'
-#' @return Factor loading and factor score matrices.
+#' @returns
+#' \item{scores}{The estimated factor score matrix.}
+#' \item{loadings}{The estimated loading matrix.}
+#' \item{PVE}{A vector of 1 - penalized loss in each iteration of the AO procedure.}
+#' \item{Residual}{The penalized loss of the solution.}
+#' \item{converged}{Whether the AO procedure converged before \code{maxiter}.}
+#' \item{center}{Item means used to center the data.}
+#' \item{scale}{Item standard deviations used to scale the data (1s if \code{standardize = FALSE}).}
+#'
 #' @examples
 #' \dontrun{
-#' fit.seafar <- seafar_lasso(USArrests, 2, lambda = 10, INIT = "svd")
+#' fit <- seafar_lasso_single(ddata = X, nfactors = 3, lambda = 10, INIT = "svd")
 #' }
-seafar_lasso <- function(data,
-                         nfactors,
-                         lambda,
-                         maxiter = 50,
-                         eps = 10^-4,
-                         INIT = "semirational",
-                         initloadings = NULL,
-                         standardize = TRUE,
-                         pattern = NULL) {
+seafar_lasso_single <- function(data,
+                                nfactors,
+                                lambda,
+                                maxiter = 50,
+                                eps = 10^-4,
+                                INIT = "semirational",
+                                initloadings = NULL,
+                                standardize = TRUE,
+                                pattern = NULL) {
   INIT <- check_init(INIT)
   N <- dim(data)[1]
   J <- dim(data)[2]
@@ -127,144 +317,12 @@ seafar_lasso <- function(data,
   }
 
   result <- list("scores" = scores, "loadings" = loadings, "PVE" = 1 - Lossvec, "Residual" = Lossu * ssx, "converged" = converged, "center" = xcenter, "scale" = xscale)
-
-  attr(result, "class") <- "lasso"
   return(result)
 }
 
-
-#' Multistart procedure for seafar with the LASSO penalty.
+#' Display a summary of the results of \code{seafar_lasso()}.
 #'
-#' @param data A data frame or matrix (NxJ). Data are always centered internally.
-#' @param nfactors The number of factors.
-#' @param lambda LASSO penalty tuning parameter.
-#' @param maxiter Maximum number of iterations of the AO procedure.
-#' @param eps Convergence criterion based on difference in loss between iterates.
-#' @param INIT Method to initialize loadings.
-#' @param nstarts Number of starting values.
-#' @param standardize Logical. If \code{TRUE} (default), items are scaled to unit variance (N denominator)
-#'   after centering. Centering is applied regardless.
-#' @param unshrink Logical. If \code{TRUE} (default), the zero pattern of the best solution is refitted with
-#'   \code{lambda = 0} (warm-started from that solution) to remove the shrinkage of the nonzero loadings.
-#'
-#' @returns
-#' \item{loadings}{The best estimated loading matrix (unshrunk if \code{unshrink = TRUE}).}
-#' \item{scores}{The best estimated factor score matrix (from the unshrunk refit if \code{unshrink = TRUE}).}
-#' \item{Lossvec}{A list of vectors of loss values of each starting value (lasso fits).}
-#' \item{Loss}{Loss value of the best starting value; the residual sum of squares of the refit if \code{unshrink = TRUE}.}
-#' \item{PVE}{Proportion of variance explained by the returned loadings and scores (no penalty term included).}
-#' \item{lambda}{The LASSO penalty tuning parameter used.}
-#' \item{all_losses}{Penalized loss of every starting value (lasso fits).}
-#' \item{n_best}{Number of starting values that reached the lowest lasso loss (within 0.01).}
-#' \item{n_distinct}{Number of distinct lasso loss values across starting values.}
-#' \item{converged}{Whether the returned solution converged (the refit if \code{unshrink = TRUE}).}
-#' \item{center}{Item means used to center the data.}
-#' \item{scale}{Item standard deviations used to scale the data (1s if \code{standardize = FALSE}).}
-#' \item{loadings_lasso, scores_lasso, Loss_lasso}{If \code{unshrink = TRUE}: the original lasso solution that
-#'   defined the zero pattern, and its penalized loss.}
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' fit.seafar <- seafar_lasso_multistart(
-#'   USArrests,
-#'   nfactors = 2,
-#'   lambda = 10,
-#'   INIT = "random",
-#'   nstarts = 50
-#' )
-#' }
-seafar_lasso_multistart <- function(data,
-                                    nfactors,
-                                    lambda,
-                                    maxiter = 50,
-                                    eps = 10^-4,
-                                    INIT = "semirational",
-                                    nstarts = 50,
-                                    standardize = TRUE,
-                                    unshrink = TRUE) {
-  INIT <- check_init(INIT)
-  Pout3d <- list()
-  Tout3d <- list()
-  LOSS <- array()
-  LOSSvec <- list()
-  converged <- array()
-
-  for (n in 1:nstarts) {
-    result <- seafar_lasso(data = data,
-                           nfactors = nfactors,
-                           lambda = lambda,
-                           maxiter = maxiter,
-                           eps = eps,
-                           INIT = INIT,
-                           standardize = standardize)
-
-    Pout3d[[n]] <- result$loadings
-    Tout3d[[n]] <- result$scores
-    LOSS[n] <- result$Residual
-    LOSSvec[[n]] <- 1 - result$PVE
-    converged[n] <- result$converged
-  }
-
-  # check how many times the minimum loss was achieved
-  best <- min(LOSS)
-  tol <- 1e-2
-  n_best <- sum(abs(LOSS - best) < tol)
-  n_distinct <- length(unique(round(LOSS, 2)))
-
-  # choose solution with lowest loss value
-  k <- which(LOSS == min(LOSS))
-  if (length(k) > 1) {
-    pos <- sample(1:length(k), 1)
-    k <- k[pos]
-  }
-
-  return_varselect <- list()
-  return_varselect$loadings <- Pout3d[[k]]
-  return_varselect$scores <- Tout3d[[k]]
-  return_varselect$Lossvec <- LOSSvec
-  return_varselect$Loss <- LOSS[k]
-  return_varselect$all_losses <- LOSS
-  return_varselect$n_best <- n_best
-  return_varselect$n_distinct <- n_distinct
-  return_varselect$converged <- converged[k]
-  return_varselect$lambda <- lambda
-  return_varselect$center <- result$center # same for every start
-  return_varselect$scale <- result$scale
-
-  # undo shrinkage: refit the zero pattern of the best start with lambda = 0, warm-started from it
-  if (unshrink) {
-    refit <- seafar_lasso(data = data,
-                          nfactors = nfactors,
-                          lambda = 0,
-                          maxiter = maxiter,
-                          eps = eps,
-                          initloadings = Pout3d[[k]],
-                          standardize = standardize,
-                          pattern = Pout3d[[k]])
-
-    return_varselect$loadings <- refit$loadings
-    return_varselect$scores <- refit$scores
-    return_varselect$Loss <- refit$Residual
-    return_varselect$loadings_lasso <- Pout3d[[k]] # keep the shrunk solution the pattern came from
-    return_varselect$scores_lasso <- Tout3d[[k]]
-    return_varselect$Loss_lasso <- LOSS[k]
-    return_varselect$converged <- refit$converged
-  }
-
-  # computed directly because the PVE of a lasso fit has the penalty included in its loss
-  data_scaled <- scale(data, center = return_varselect$center, scale = return_varselect$scale)
-  return_varselect$PVE <- 1 - ssres(data_scaled, return_varselect$scores, return_varselect$loadings) / sum(data_scaled^2)
-
-  attr(return_varselect, "class") <- "lasso_multistart"
-
-  return(return_varselect)
-}
-
-##' Display a summary of the results of \code{seafar_lasso_multistart()}.
-#'
-#' @param object Object of class inheriting from 'lasso_multistart'.
+#' @param object Object of class inheriting from 'seafar_lasso'.
 #' @param disp The default is \code{"loadings"} which returns only the estimated loadings matrix.
 #'             Otherwise if \code{"full"}, function returns both the estimated loadings and factor scores matrices.
 #' @param nrow Number of rows of the loading matrix to be displayed, default is 10.
@@ -272,9 +330,9 @@ seafar_lasso_multistart <- function(data,
 #' @export
 #' @examples
 #' \dontrun{
-#' summary(fit.seafar, disp = "full")
+#' summary(fit)
 #' }
-summary.lasso_multistart <- function(object, disp = "loadings", nrow = 10, ...) {
+summary.seafar_lasso <- function(object, disp = "loadings", nrow = 10, ...) {
   if (missing(disp)) {
     disp <- "loadings"
   }

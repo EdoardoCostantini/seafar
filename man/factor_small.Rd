@@ -17,8 +17,6 @@ Function to retain number of factors/components for traditional size data set us
 }
 \examples{
 \dontrun{
-data(big5, package = "qgraph")
-X <- scale(big5)
-a <- factor_small(X)
+nfactors <- factor_small(data = X)
 }
 }
