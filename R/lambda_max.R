@@ -13,7 +13,6 @@
 #'   after centering. Centering is applied regardless.
 #'
 #' @returns The maximum value for LASSO penalty parameter.
-#' @export
 #'
 #' @examples
 #'\dontrun{
@@ -116,7 +115,6 @@ lambda_max <- function(data,
 #' @param eps Numerical tolerance used to treat very small loadings as zero.
 #'
 #' @returns A logical vector indicating whether each factor has at least `min_items` nonzero loadings.
-#' @export
 #'
 #' @examples
 #'\dontrun{
@@ -142,7 +140,6 @@ enough_items <- function(loadings,
 #'   after centering. Centering is applied regardless.
 #'
 #' @returns Estimated loading matrix.
-#' @export
 #'
 #' @examples
 #'\dontrun{

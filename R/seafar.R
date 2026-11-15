@@ -146,7 +146,6 @@ seafar <- function(data,
 #' \item{center}{Item means used to center the data.}
 #' \item{scale}{Item standard deviations used to scale the data (1s if \code{standardize = FALSE}).}
 #'
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -300,7 +299,6 @@ seafar_orthogonal <- function(data,
 #' \item{center}{Item means used to center the data.}
 #' \item{scale}{Item standard deviations used to scale the data (1s if \code{standardize = FALSE}).}
 #'
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -461,7 +459,6 @@ seafar_general <- function(data,
 #'             Otherwise if \code{"full"}, function returns both the estimated loadings and factor scores matrices.
 #' @param nrow Number of rows of the loading matrix to be displayed, default is 10.
 #' @param ...  Argument to be passed to or from other methods.
-#' @export
 #' @examples
 #' \dontrun{
 #' summary(big5_result, disp = "full")

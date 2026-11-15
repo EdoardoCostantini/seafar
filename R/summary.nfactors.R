@@ -4,7 +4,6 @@
 #' @param ... Argument to be passed to or from other methods.
 #'
 #' @returns Summary of the number of factors retained using various methods.
-#' @export
 #'
 #' @examples
 #' \dontrun{

@@ -16,7 +16,6 @@
 #' \item{propzero}{Proportion of zero loadings.}
 #' \item{smallestP}{Smallest nonzero loading.}
 #' \item{maxsdP}{Maximum standard deviation of loading.}
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -352,7 +351,6 @@ retry_lasso <- function(fit, what, lambda, times = 10) {
 #' @param ... Argument to be passed to or from other methods.
 #'
 #' @returns Summary of the results.
-#' @export
 #'
 #' @examples
 #' \dontrun{
