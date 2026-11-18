@@ -1,0 +1,14 @@
+citHeader("If you use this work, please cite it as below.")
+
+bibentry(
+  bibtype = "Misc",
+  title = "Sparse Exploratory Approximate Factor Analysis: A Tutorial for the R package seafar",
+  author = c(
+    person("Tra", "Le"), 
+    person("Stefan", "Kirsch"), 
+    person("Katrijn", "Van Deun")
+  ),
+  version = "0.1.0",
+  year = "2026",
+  doi = "https://doi.org/10.5281/zenodo.20326842"
+)

@@ -4,3 +4,4 @@
 ^vignettes/\.quarto$
 ^vignettes/*_files$
 ^SEAFAR_tutorial\.pdf$
+^CITATION.cff
