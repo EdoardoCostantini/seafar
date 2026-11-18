@@ -4,14 +4,12 @@
 \alias{reproduce_autism_dataset}
 \title{Reproduce the autism dataset from GEO accession GSE7329}
 \usage{
-reproduce_autism_dataset(
-  source_url =
-    "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE7nnn/GSE7329/matrix/GSE7329_series_matrix.txt.gz",
-  envir = parent.frame()
-)
+reproduce_autism_dataset(source_url, envir = parent.frame())
 }
 \arguments{
-\item{source_url}{Source URL of the original Series Matrix file on the NCBI GEO ftp server.}
+\item{source_url}{Source URL of the original Series Matrix file on the NCBI
+GEO ftp server. Since the URL is too long for the documentation, we broke it
+down into parts as in the example.}
 
 \item{envir}{the environment where the function is called from.}
 }
@@ -25,8 +23,19 @@ existing preprocessing steps.
 \details{
 Running \code{autism <- reproduce_autism_dataset()} is equivalent to \code{data("autism")}
 
-For more information, consult \code{data/README.md}.
+For more information, consult \code{\link{autism}}.
 }
 \examples{
-autism <- reproduce_autism_dataset()
+server <- "https://ftp.ncbi.nlm.nih.gov/geo/"
+series <- "series/GSE7nnn/GSE7329/matrix/"
+tarball <- "GSE7329_series_matrix.txt.gz"
+autism <- reproduce_autism_dataset(source_url = paste0(server, series, tarball))
+}
+\references{
+Nishimura, Y., Martin, C. L., Vazquez-Lopez, A., Spence, S. J.,
+Alvarez-Retuerto, A. I., Sigman, M., Steindler, C., Pellegrini, S., Schanen,
+N. C., Warren, S. T., et al. (2007). Genome-wide expression profiling of
+lymphoblastoid cell lines distinguishes different forms of autism and reveals
+shared pathways. Human Molecular Genetics, 16(14), 1682–1698.
+https://doi.org/10.1093/hmg/ddm116
 }

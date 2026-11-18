@@ -5,18 +5,31 @@
 #'
 #' Running `autism <- reproduce_autism_dataset()` is equivalent to `data("autism")`
 #'
-#' For more information, consult `data/README.md`.
+#' For more information, consult \code{\link{autism}}.
 #'
-#' @param source_url Source URL of the original Series Matrix file on the NCBI GEO ftp server.
+#' @param source_url Source URL of the original Series Matrix file on the NCBI 
+#' GEO ftp server. Since the URL is too long for the documentation, we broke it 
+#' down into parts as in the example.
 #' @param envir the environment where the function is called from.
 #' @importFrom utils read.csv
 #'
 #' @return Invisibly returns the processed matrix `autism`.
 #' @examples
-#' autism <- reproduce_autism_dataset()
+#' server <- "https://ftp.ncbi.nlm.nih.gov/geo/"
+#' series <- "series/GSE7nnn/GSE7329/matrix/"
+#' tarball <- "GSE7329_series_matrix.txt.gz"
+#' autism <- reproduce_autism_dataset(source_url = paste0(server, series, tarball))
 #' @export
+#' @references
+#'
+#' Nishimura, Y., Martin, C. L., Vazquez-Lopez, A., Spence, S. J.,
+#' Alvarez-Retuerto, A. I., Sigman, M., Steindler, C., Pellegrini, S., Schanen,
+#' N. C., Warren, S. T., et al. (2007). Genome-wide expression profiling of
+#' lymphoblastoid cell lines distinguishes different forms of autism and reveals
+#' shared pathways. Human Molecular Genetics, 16(14), 1682–1698.
+#' https://doi.org/10.1093/hmg/ddm116
 reproduce_autism_dataset <- function(
-  source_url = "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE7nnn/GSE7329/matrix/GSE7329_series_matrix.txt.gz",
+  source_url,
   envir = parent.frame()
 ) {
   autism <- .read_autism_matrix_from_source(source_url)
