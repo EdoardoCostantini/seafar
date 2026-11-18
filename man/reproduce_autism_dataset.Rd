@@ -26,10 +26,12 @@ Running \code{autism <- reproduce_autism_dataset()} is equivalent to \code{data(
 For more information, consult \code{\link{autism}}.
 }
 \examples{
+\dontrun{
 server <- "https://ftp.ncbi.nlm.nih.gov/geo/"
 series <- "series/GSE7nnn/GSE7329/matrix/"
 tarball <- "GSE7329_series_matrix.txt.gz"
 autism <- reproduce_autism_dataset(source_url = paste0(server, series, tarball))
+}
 }
 \references{
 Nishimura, Y., Martin, C. L., Vazquez-Lopez, A., Spence, S. J.,

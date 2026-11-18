@@ -15,10 +15,12 @@
 #'
 #' @return Invisibly returns the processed matrix `autism`.
 #' @examples
+#' \dontrun{
 #' server <- "https://ftp.ncbi.nlm.nih.gov/geo/"
 #' series <- "series/GSE7nnn/GSE7329/matrix/"
 #' tarball <- "GSE7329_series_matrix.txt.gz"
 #' autism <- reproduce_autism_dataset(source_url = paste0(server, series, tarball))
+#' }
 #' @export
 #' @references
 #'
