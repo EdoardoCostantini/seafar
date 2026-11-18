@@ -19,8 +19,9 @@ Function to retain number of factors/components using various methods.
 }
 \examples{
 \dontrun{
-data(big5, package = "qgraph")
-X <- scale(big5)
-a <- factor_retention(X, large.data = FALSE)
+nfactors <- factor_retention(
+  data = X,
+  large.data = FALSE
+)
 }
 }

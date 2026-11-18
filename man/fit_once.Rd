@@ -41,7 +41,7 @@ Function to fit SEAFA with LASSO penalty once and get loading matrix
 }
 \examples{
 \dontrun{
-P <- seafar_lasso_multistart(
+P <- seafar_lasso(
   scale(big5),
   nfactors = 5,
   lambda = 10,

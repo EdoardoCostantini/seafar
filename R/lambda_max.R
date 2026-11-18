@@ -13,13 +13,12 @@
 #'   after centering. Centering is applied regardless.
 #'
 #' @returns The maximum value for LASSO penalty parameter.
-#' @export
 #'
 #' @examples
 #'\dontrun{
 #' max_lambda <- lambda_max(
-#'   data = scale(big5),
-#'   nfactors = 5,
+#'   data = X,
+#'   nfactors = 3,
 #'   INIT = 'semirational')
 #'}
 lambda_max <- function(data,
@@ -116,7 +115,6 @@ lambda_max <- function(data,
 #' @param eps Numerical tolerance used to treat very small loadings as zero.
 #'
 #' @returns A logical vector indicating whether each factor has at least `min_items` nonzero loadings.
-#' @export
 #'
 #' @examples
 #'\dontrun{
@@ -142,11 +140,10 @@ enough_items <- function(loadings,
 #'   after centering. Centering is applied regardless.
 #'
 #' @returns Estimated loading matrix.
-#' @export
 #'
 #' @examples
 #'\dontrun{
-#' P <- seafar_lasso_multistart(
+#' P <- seafar_lasso(
 #'   scale(big5),
 #'   nfactors = 5,
 #'   lambda = 10,
@@ -162,7 +159,7 @@ fit_once <- function(data,
                      nstarts = 1,
                      standardize = TRUE){
   INIT <- check_init(INIT)
-  fit <- seafar_lasso_multistart(data = data,
+  fit <- seafar_lasso(data = data,
                                  nfactors = nfactors,
                                  maxiter = maxiter,
                                  eps = eps,

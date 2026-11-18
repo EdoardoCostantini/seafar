@@ -22,7 +22,6 @@
 #' \item{center}{Item means used to center the data.}
 #' \item{scale}{Item standard deviations used to scale the data (1s if \code{standardize = FALSE}).}
 #'
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -129,12 +128,12 @@ is.seafar_wst <- function(data,
 #' @param ... Argument to be passed to or from other methods.
 #'
 #' @returns Summary of the results.
-#' @export
 #'
 #' @examples
 #' \dontrun{
 #' summary(IS_result)
 #' }
+#' @export
 summary.ISwarmstart <- function(object, ...) {
   cat(sprintf(
     "The cardinality selected by the Index of Sparseness is: %s\n",

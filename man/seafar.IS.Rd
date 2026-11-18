@@ -13,6 +13,7 @@ seafar.IS(
   INIT = if (warmstart) "rational" else "semirational",
   orthogonal = FALSE,
   nstarts = 50,
+  nstarts.tune = nstarts,
   TOL = 3,
   THR = 0.03,
   card.length = 100,
@@ -36,7 +37,10 @@ and \code{"semirational"} if \code{warmstart = FALSE}.}
 
 \item{orthogonal}{Orthogonal or non-orthogonal factors, default is FALSE.}
 
-\item{nstarts}{Number of starts for fitting the selected model and, if \code{warmstart = FALSE}, for model selection.}
+\item{nstarts}{Number of starts for refitting the model with the selected value, default is 50.}
+
+\item{nstarts.tune}{Number of starts for each candidate value during model selection. Only used if
+\code{warmstart = FALSE}; with warm starts every candidate is fitted once. Defaults to \code{nstarts}.}
 
 \item{TOL}{Number of decimals used to decide whether two PEV values are the same. Only used if \code{warmstart = FALSE}.}
 
@@ -65,9 +69,13 @@ Model selection for SEAFAR using Index of Sparseness
 \dontrun{
 IS_result <- seafar.IS(
   data = X,
-  nfactors = 5,
-  warmstart = TRUE,
+  nfactors = 3,
+  warmstart = FALSE,
+  nstarts = 100,
+  nstarts.tune = 25,
   card.length = 100
 )
+summary(IS_result)
+summary(IS_result$selmodel)
 }
 }

@@ -59,6 +59,7 @@ solution with the lowest loss is returned.
 }
 \examples{
 \dontrun{
-big5_seafa <- seafar(USArrests, 2, 4, INIT = "random", orthogonal = TRUE, nstarts = 50)
+fit <- seafar(data = X, nfactors = 3, C = 9, INIT = "random", orthogonal = TRUE, nstarts = 50)
+summary(fit)
 }
 }

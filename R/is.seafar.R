@@ -28,8 +28,8 @@
 #' \dontrun{
 #' IS <- is.seafar_original(
 #'   data = X,
-#'   nfactors = 5,
-#'   C = 240,
+#'   nfactors = 3,
+#'   C = 9,
 #'   INIT = "random",
 #'   orthogonal = TRUE,
 #'   nstarts = 50
@@ -100,7 +100,7 @@ is.seafar_original <- function(data,
 }
 
 
-#' Model selection for SEAFAR using modified Index of Sparseness
+#' Model selection for SEAFAR using Index of Sparseness
 #' (Van Deun et al., 2026).
 #'
 #' @param data A data frame or matrix (NxJ).
@@ -130,6 +130,7 @@ is.seafar_original <- function(data,
 #'   TOL = 2,
 #'   THR = 0.15
 #' )
+#' summary(selcard)
 #' }
 is.seafar <- function(data,
                       nfactors,
@@ -224,12 +225,12 @@ is.seafar <- function(data,
 #' @param ... Argument to be passed to or from other methods.
 #'
 #' @returns Summary of the results.
-#' @export
 #'
 #' @examples
 #' \dontrun{
-#' summary(IS_result)
+#' summary(selcard)
 #' }
+#' @export
 summary.is_seafar <- function(object, ...) {
   selcard <- if (is.list(object)) object$selcard else object
   cat(sprintf(
