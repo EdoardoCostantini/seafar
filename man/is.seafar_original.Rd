@@ -10,9 +10,9 @@ is.seafar_original(
   C,
   maxiter = 50,
   eps = 10^-4,
-  INIT,
+  INIT = "semirational",
   orthogonal = FALSE,
-  nstarts,
+  nstarts = 50,
   standardize = TRUE
 )
 }

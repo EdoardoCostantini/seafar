@@ -11,7 +11,7 @@ seafar_lasso_multistart(
   maxiter = 50,
   eps = 10^-4,
   INIT = "semirational",
-  nstarts,
+  nstarts = 50,
   standardize = TRUE,
   unshrink = TRUE
 )
@@ -42,6 +42,8 @@ after centering. Centering is applied regardless.}
 \item{scores}{The best estimated factor score matrix (from the unshrunk refit if \code{unshrink = TRUE}).}
 \item{Lossvec}{A list of vectors of loss values of each starting value (lasso fits).}
 \item{Loss}{Loss value of the best starting value; the residual sum of squares of the refit if \code{unshrink = TRUE}.}
+\item{PVE}{Proportion of variance explained by the returned loadings and scores (no penalty term included).}
+\item{lambda}{The LASSO penalty tuning parameter used.}
 \item{all_losses}{Penalized loss of every starting value (lasso fits).}
 \item{n_best}{Number of starting values that reached the lowest lasso loss (within 0.01).}
 \item{n_distinct}{Number of distinct lasso loss values across starting values.}

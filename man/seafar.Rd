@@ -11,8 +11,10 @@ seafar(
   eps = 1e-04,
   maxiter = 50,
   initloadings = NULL,
-  INIT,
+  INIT = "semirational",
   orthogonal = FALSE,
+  nstarts = 50,
+  show_progress = FALSE,
   standardize = TRUE
 )
 }
@@ -33,18 +35,30 @@ seafar(
 
 \item{orthogonal}{Orthogonal or non-orthogonal factors, default is FALSE.}
 
+\item{nstarts}{Number of starts, default is 50. Only one start is run if \code{initloadings} is provided
+or \code{INIT = "svd"}, because every start would be identical.}
+
+\item{show_progress}{Option of print progress bar, default is FALSE.}
+
 \item{standardize}{Logical. If \code{TRUE} (default), items are scaled to unit variance (N denominator)
 after centering. Centering is applied regardless.}
 }
 \value{
-Factor loading and factor score matrices, plus the \code{center} and \code{scale} used to transform the data.
+A list with
+\item{scores}{The best estimated factor score matrix.}
+\item{loadings}{The best estimated loading matrix.}
+\item{PVE}{A vector of PVE in each iteration of the AO procedure of the best start.}
+\item{Residual}{The residual sum of squares of the best start.}
+\item{center}{Item means used to center the data.}
+\item{scale}{Item standard deviations used to scale the data (1s if \code{standardize = FALSE}).}
 }
 \description{
 Function for exploratory approximate factor analysis resulting in a sparse
-measurement model
+measurement model. The model is fitted from multiple starting values and the
+solution with the lowest loss is returned.
 }
 \examples{
 \dontrun{
-big5_seafa <- seafar(USArrests, 2, 4, INIT = "svd", orthogonal = TRUE)
+big5_seafa <- seafar(USArrests, 2, 4, INIT = "random", orthogonal = TRUE, nstarts = 50)
 }
 }

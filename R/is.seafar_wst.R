@@ -4,9 +4,9 @@
 #' @param nfactors Number of factors.
 #' @param maxiter Maximum number of iterations for the AO procedure.
 #' @param eps Convergence criterion based on difference in loss between iterates.
-#' @param INIT Method to initialize loading matrix.
+#' @param INIT Method to initialize loading matrix, default is \code{"rational"}.
 #' @param orthogonal Orthogonal or non-orthogonal factors, default is FALSE.
-#' @param card.length Number of candidate cardinality values to test.
+#' @param card.length Number of candidate cardinality values to test, default is 100.
 #' @param show_progress Option of print progress bar, default is FALSE.
 #' @param standardize Logical. If \code{TRUE} (default), items are scaled to unit variance (N denominator)
 #'   after centering. Centering is applied regardless.
@@ -38,11 +38,12 @@ is.seafar_wst <- function(data,
                           nfactors,
                           eps = 1e-4,
                           maxiter = 50,
-                          INIT,
+                          INIT = "rational",
                           orthogonal = FALSE,
-                          card.length,
+                          card.length = 100,
                           show_progress = FALSE,
                           standardize = TRUE) {
+  INIT <- check_init(INIT)
   IS <- list()
   n <- dim(data)[1]
   J <- dim(data)[2]
@@ -80,9 +81,11 @@ is.seafar_wst <- function(data,
   }
 
 
+  fit_fun <- if (orthogonal == TRUE) seafar_orthogonal else seafar_general
+
   for (i in 1:length(regpath)) {
     card <- regpath[i]
-    seafa_result <- seafar(data, nfactors, C = card, eps = eps, maxiter = maxiter, initloadings = loadings, INIT = INIT, orthogonal = orthogonal, standardize = FALSE) # data already preprocessed above
+    seafa_result <- fit_fun(data, nfactors, C = card, eps = eps, maxiter = maxiter, initloadings = loadings, INIT = INIT, standardize = FALSE) # data already preprocessed above
     loadings <- seafa_result$loadings
     # scores <- seafa_result$scores
     pveseafa <- seafa_result$PVE[length(seafa_result$PVE)]

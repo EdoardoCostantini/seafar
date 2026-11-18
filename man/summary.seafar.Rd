@@ -4,13 +4,15 @@
 \alias{summary.seafar}
 \title{Display a summary of the results of \code{seafar()}.}
 \usage{
-\method{summary}{seafar}(object, disp = "loadings", ...)
+\method{summary}{seafar}(object, disp = "loadings", nrow = 10, ...)
 }
 \arguments{
 \item{object}{Object of class inheriting from 'seafar'.}
 
 \item{disp}{The default is \code{"loadings"} which returns only the estimated loadings matrix.
 Otherwise if \code{"full"}, function returns both the estimated loadings and factor scores matrices.}
+
+\item{nrow}{Number of rows of the loading matrix to be displayed, default is 10.}
 
 \item{...}{Argument to be passed to or from other methods.}
 }
@@ -19,7 +21,6 @@ Display a summary of the results of \code{seafar()}.
 }
 \examples{
 \dontrun{
-results <- seafar(X)
-summary(results, disp = "full")
+summary(big5_result, disp = "full")
 }
 }

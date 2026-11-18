@@ -10,12 +10,13 @@ is.seafar(
   nfactors,
   maxiter = 50,
   eps = 10^-4,
-  INIT,
+  INIT = "semirational",
   orthogonal = FALSE,
-  nstarts,
-  TOL,
-  THR,
-  standardize = TRUE
+  nstarts = 50,
+  TOL = 3,
+  THR = 0.03,
+  standardize = TRUE,
+  card.length = 100
 )
 }
 \arguments{
@@ -39,6 +40,8 @@ is.seafar(
 
 \item{standardize}{Logical. If \code{TRUE} (default), items are scaled to unit variance
 after centering. Centering is applied regardless.}
+
+\item{card.length}{Maximum number of candidate cardinality values to test, default is 100.}
 }
 \value{
 The selected cardinality value.

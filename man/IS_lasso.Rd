@@ -11,7 +11,7 @@ IS_lasso(
   maxiter = 50,
   eps = 10^-4,
   INIT = "semirational",
-  nstarts,
+  nstarts = 50,
   standardize = TRUE
 )
 }
@@ -50,7 +50,7 @@ IS <- IS_lasso(
   data = X,
   nfactors = 5,
   lambda = 100,
-  INIT = "mixed",
+  INIT = "semirational",
   nstarts = 50
 )
 }

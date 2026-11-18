@@ -7,7 +7,7 @@
 factor_retention(data, large.data = FALSE)
 }
 \arguments{
-\item{data}{A NxJ matrix of standardized items.}
+\item{data}{A NxJ matrix or data frame of observed variables.}
 
 \item{large.data}{Logical. If TRUE, use methods suitable for very large datasets.}
 }
