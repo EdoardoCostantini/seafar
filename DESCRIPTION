@@ -5,6 +5,7 @@ Authors@R: c(person(given = "Tra", family = "Le", role = c("aut", "cre"),
     email = "t.t.le_1@tilburguniversity.edu"), 
     person(given = "Katrijn", family = "Van Deun", role = "aut"),
     person(given = "Stefan", family = "Kirsch", role = "ctb"))
+    person(given = "Edoardo", family = "Costantini", role = "ctb"))
 Description: Functions to perform Sparse Exploratory Approximate Factor Analysis for High-dimensional Data.
 License: GPL (>= 3)
 Encoding: UTF-8
